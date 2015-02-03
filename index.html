@@ -1,6 +1,20 @@
 <html>
     <head>
         <title>WebGL Test</title>
+
+        <script id="vertSrc" type="vertSrc" src="vertSrc.vs">
+            attribute vec3 pos;
+            
+            void main() {
+                gl_Position = vec4(pos, 1.0);
+            }
+        </script>
+        <script id="fragSrc" type="fragSrc" src="fragSrc.fs">
+            
+            void main() {
+                gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+            }
+        </script>
         <script type="text/javascript" src="webGL.js"></script>
     </head>
 
