@@ -13,10 +13,16 @@ function glBuffer(gl, target, usage) {
         gl.bindBuffer(this.target, this.buffPtr);
     }
 
-    //data is the data to put on the gpu, needs to be ArrayBuffer eg Float32Array
+    //data is the data to put on the gpu, needs to be ArrayBuffer eg Float32Array or the size to allocate
     this.bufferData = function(data) {
         this.bindBuffer();
         this.gl.bufferData(this.target, data, this.usage);
+    }
+
+    //data is the data to put on the gpu, needs to be ArrayBuffer eg Float32Array (offset is in bytes)
+    this.bufferSubData = function(offset, data) {
+        this.bindBuffer();
+        this.gl.bufferSubData(this.target, offset, data);
     }
 
 }
@@ -44,8 +50,21 @@ function glShaderProgram(gl, vertSrc, fragSrc){
         this.gl.useProgram(this.prgm);
     }
 
+    //attrib is string name of vertexAttribPointer in the program
     this.getAttLoc = function (attrib) {
         return this.gl.getAttribLocation(this.prgm, attrib);
+    }
+
+    //attrib is string name of vertexAttribPointer in the program
+    this.enableVAA = function (attrib) {
+        var att = this.getAttLoc(attrib);
+        gl.enableVertexAttribArray(this.prgm, att);
+        return att;
+    }
+
+    //uniform is the string name of a uniform in the program
+    this.getyLoc = function (uniform) {
+        gl.getUniformLocation(this.prgm, uniform);
     }
 }
 
@@ -88,12 +107,10 @@ function main(){
     shdr.usePrgm();
 
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    
+
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    att = shdr.getAttLoc("pos");
-
-    gl.enableVertexAttribArray(shdr.prgm, att);
+    att = shdr.enableVAA("pos");
 
     gl.vertexAttribPointer(att, 3, gl.FLOAT, false, 12, 0);
 
