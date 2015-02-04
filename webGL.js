@@ -41,7 +41,11 @@ function glShaderProgram(gl, vertSrc, fragSrc){
     }
 
     this.usePrgm = function () {
-        this.gl.usePrgmogram(this.prgm);
+        this.gl.useProgram(this.prgm);
+    }
+
+    this.getAttLoc = function (attrib) {
+        return this.gl.getAttribLocation(this.prgm, attrib);
     }
 }
 
@@ -71,7 +75,27 @@ function main(){
     //testing
     vertBuf = new glBuffer(gl, gl.ARRAY_BUFFER, gl.STATIC_DRAW);
 
+    vertBuf.bindBuffer();
+
+    val = [ -1.0, 1.0, 0.0, 1.0, -1.0, 0.0 ];
+
+    vertBuf.bufferData(new Float32Array(val));
+
     vs = document.getElementById("vertSrc").innerHTML;
     fs = document.getElementById("fragSrc").innerHTML;
     shdr = new glShaderProgram(gl, vs, fs);
+    shdr.initPrgm();
+    shdr.usePrgm();
+
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    att = shdr.getAttLoc("pos");
+
+    gl.enableVertexAttribArray(shdr.prgm, att);
+
+    gl.vertexAttribPointer(att, 3, gl.FLOAT, false, 12, 0);
+
+    gl.drawArrays(gl.LINES, 0, 2);
 }
