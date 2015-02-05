@@ -27,10 +27,12 @@ function glBuffer(gl, target, usage) {
 
 }
 
-function glTexture(gl, target) {
+function glTexture(gl, target, minf, magf) {
     this.tex = gl.createTexture();
     this.gl = gl;
     this.target = target;
+    this.minf = minf;
+    this.magf = magf;
 
     this.bindTexture = function () {
         this.gl.bindTexture(this.target, this.tex);
@@ -47,6 +49,12 @@ function glTexture(gl, target) {
     //    this.bindTexture();
     //    this.gl.texImage2D(this.target, level, infmt, fmt, type, data);
     //}
+
+    this.setParams = function () {
+        this.bindTexture();
+        this.gl.texParameteri(this.target, this.gl.TEXTURE_MIN_FILTER, this.minf);
+        this.gl.texParameteri(this.target, this.gl.TEXTURE_MAG_FILTER, this.magf);
+    }
 
     this.texParameteri = function (parm, val) {
         this.bindTexture();
