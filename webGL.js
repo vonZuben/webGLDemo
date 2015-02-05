@@ -27,6 +27,33 @@ function glBuffer(gl, target, usage) {
 
 }
 
+function glTexture(gl, target) {
+    this.tex = gl.createTexture();
+    this.gl = gl;
+    this.target = target;
+
+    this.bindTexture = function () {
+        this.gl.bindTexture(this.target, this.tex);
+    }
+
+    // the documentation is in webGL quick reference card on Khronos website
+    // this is just a object oriented implementation
+    this.texImage2D = function (level, infmt, width, height, brdr, fmt, type, data) {
+        this.bindTexture();
+        this.gl.texImage2D(this.target, level, infmt, width, height, brdr, fmt, type, data);
+    }
+
+    //this.texImage2D = function (level, infmt, fmt, type, data) {
+    //    this.bindTexture();
+    //    this.gl.texImage2D(this.target, level, infmt, fmt, type, data);
+    //}
+
+    this.texParameteri = function (parm, val) {
+        this.bindTexture();
+        this.gl.texParameteri(this.target, parm, val);
+    }
+}
+
 //takes gl context and a list of shader source strings to be compiled onto the program
 function glShaderProgram(gl, vertSrc, fragSrc){
     this.prgm = gl.createProgram();
