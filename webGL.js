@@ -120,6 +120,33 @@ function initGL(canvas) {
     return gl;
 }
 
+function simpleGL(gl) {
+
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+
+    vertData = [
+         0.0,  1.0, 0.0,
+        -1.0, -1.0, 0.0,
+         1.0, -1.0, 0.0
+            ];
+
+    vs = document.getElementById("vertSrc").innerHTML;
+    fs = document.getElementById("fragSrc").innerHTML;
+
+    simpleShdr = new glShaderProgram(gl, vs, fs);
+    simpleShdr.initPrgm();
+    simpleShdr.usePrgm();
+
+    vertBuf = new glBuffer(gl, gl.ARRAY_BUFFER, gl.STATIC_DRAW);
+    vertBuf.bindBuffer();
+    vertBuf.bufferData(new Float32Array(vertData));
+
+    att = simpleShdr.enableVAA("pos")
+    gl.vertexAttribPointer(att, 3, gl.FLOAT, false, 12, 0);
+
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+}
 
 function main(){
     var canv = document.getElementById("canv");
@@ -127,27 +154,30 @@ function main(){
     gl = initGL(canv);
 
     //testing
-    vertBuf = new glBuffer(gl, gl.ARRAY_BUFFER, gl.STATIC_DRAW);
 
-    vertBuf.bindBuffer();
+    simpleGL(gl);
 
-    val = [ -1.0, 1.0, 0.0, 1.0, -1.0, 0.0 ];
+    //vertBuf = new glBuffer(gl, gl.ARRAY_BUFFER, gl.STATIC_DRAW);
 
-    vertBuf.bufferData(new Float32Array(val));
+    //vertBuf.bindBuffer();
 
-    vs = document.getElementById("vertSrc").innerHTML;
-    fs = document.getElementById("fragSrc").innerHTML;
-    shdr = new glShaderProgram(gl, vs, fs);
-    shdr.initPrgm();
-    shdr.usePrgm();
+    //val = [ -1.0, 1.0, 0.0, 1.0, -1.0, 0.0 ];
 
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    //vertBuf.bufferData(new Float32Array(val));
 
-    gl.clear(gl.COLOR_BUFFER_BIT);
+    //vs = document.getElementById("vertSrc").innerHTML;
+    //fs = document.getElementById("fragSrc").innerHTML;
+    //shdr = new glShaderProgram(gl, vs, fs);
+    //shdr.initPrgm();
+    //shdr.usePrgm();
 
-    att = shdr.enableVAA("pos");
+    //gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
-    gl.vertexAttribPointer(att, 3, gl.FLOAT, false, 12, 0);
+    //gl.clear(gl.COLOR_BUFFER_BIT);
 
-    gl.drawArrays(gl.LINES, 0, 2);
+    //att = shdr.enableVAA("pos");
+
+    //gl.vertexAttribPointer(att, 3, gl.FLOAT, false, 12, 0);
+
+    //gl.drawArrays(gl.LINES, 0, 2);
 }
