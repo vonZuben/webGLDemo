@@ -98,8 +98,8 @@ function glShaderProgram(gl, vertSrc, fragSrc){
     }
 
     //uniform is the string name of a uniform in the program
-    this.getyLoc = function (uniform) {
-        gl.getUniformLocation(this.prgm, uniform);
+    this.getuLoc = function (uniform) {
+        return gl.getUniformLocation(this.prgm, uniform);
     }
 }
 
@@ -127,5 +127,6 @@ function main(){
 
     //testing
 
-    simpleGL(gl);
+    //simpleGL(gl);
+    perspecGL(gl);
 }
