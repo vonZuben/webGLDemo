@@ -128,5 +128,6 @@ function main(){
     //testing
 
     //simpleGL(gl);
-    perspecGL(gl);
+    //perspecGL(gl);
+    animSimpleGL(gl);
 }
