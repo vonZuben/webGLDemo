@@ -123,7 +123,7 @@ function initGL(canvas) {
 function main(){
     var canv = document.getElementById("canv");
 
-    gl = initGL(canv);
+    var gl = initGL(canv);
 
     //testing
 

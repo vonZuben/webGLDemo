@@ -22,34 +22,34 @@ function perspecGL(gl) {
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
     // verts for a triangle
-    vertData = [
+    var vertData = [
          0.0,  1.0, -5.0,
         -1.0, -1.0, -5.0,
          1.0, -1.0, -5.0
             ];
 
     // shader program sources
-    vs = getVertSh();
-    fs = getFragSh();
+    var vs = getVertSh();
+    var fs = getFragSh();
 
     // make the shader program and be sure to usePrgm()
-    simpleShdr = new glShaderProgram(gl, vs, fs);
+    var simpleShdr = new glShaderProgram(gl, vs, fs);
     simpleShdr.initPrgm();
     simpleShdr.usePrgm();
 
     // make vertex buffer for shader program attribute needs
     // need to bind the buffer but will happen automatically on bufferData()
-    vertBuf = new glBuffer(gl, gl.ARRAY_BUFFER, gl.STATIC_DRAW);
+    var vertBuf = new glBuffer(gl, gl.ARRAY_BUFFER, gl.STATIC_DRAW);
     vertBuf.bindBuffer();
     vertBuf.bufferData(new Float32Array(vertData));
 
     // enable shader program vertex attribute for the verts
     // and make it point into the buffer appropriately
-    att = simpleShdr.enableVAA("pos")
+    var att = simpleShdr.enableVAA("pos")
     gl.vertexAttribPointer(att, 3, gl.FLOAT, false, 12, 0);
 
     // set the perspective uniform in the shader
-    persp = mat4.create();
+    var persp = mat4.create();
     mat4.perspective(45, 800 / 500 , 0.1, 100, persp);
     gl.uniformMatrix4fv(simpleShdr.getuLoc("persp"), false, persp);
 
