@@ -40,9 +40,14 @@ function glTexture(gl, target, minf, magf) {
 
     // the documentation is in webGL quick reference card on Khronos website
     // this is just a object oriented implementation
-    this.texImage2D = function (level, infmt, width, height, brdr, fmt, type, data) {
+    this.texData2D = function (level, infmt, width, height, brdr, fmt, type, data) {
         this.bindTexture();
         this.gl.texImage2D(this.target, level, infmt, width, height, brdr, fmt, type, data);
+    }
+
+    this.texImage2D = function (level, infmt, width, fmt, type, image) {
+        this.bindTexture();
+        this.gl.texImage2D(this.target, level, infmt, fmt, type, image);
     }
 
     //this.texImage2D = function (level, infmt, fmt, type, data) {
