@@ -50,7 +50,7 @@ function perspecGL(gl) {
 
     // set the perspective uniform in the shader
     var persp = mat4.create();
-    mat4.perspective(45, 800 / 500 , 0.1, 100, persp);
+    mat4.perspective(45, 500 / 500 , 0.1, 100, persp);
     gl.uniformMatrix4fv(simpleShdr.getuLoc("persp"), false, persp);
 
     // clear and draw to the bound frameBuffer (screen by default)
