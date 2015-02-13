@@ -93,7 +93,7 @@ function glShaderProgram(gl, vertSrc, fragSrc){
     //attrib is string name of vertexAttribPointer in the program
     this.enableVAA = function (attrib) {
         var att = this.getAttLoc(attrib);
-        gl.enableVertexAttribArray(this.prgm, att);
+        gl.enableVertexAttribArray(att);
         return att;
     }
 
@@ -129,5 +129,6 @@ function main(){
 
     //simpleGL(gl);
     //perspecGL(gl);
-    animSimpleGL(gl);
+    //animSimpleGL(gl);
+    colorGL(gl);
 }
