@@ -146,6 +146,7 @@ function glResourceMgr() {
 
     this.loadImage = function (img, into) {
         var caller = this;
+        waiting += 1;
         into.onload = function () {
             addReady.call(caller);
         }
