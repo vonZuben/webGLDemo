@@ -93,18 +93,60 @@ function glShaderProgram(gl, vertSrc, fragSrc){
     //attrib is string name of vertexAttribPointer in the program
     this.enableVAA = function (attrib) {
         var att = this.getAttLoc(attrib);
-        gl.enableVertexAttribArray(att);
+        this.gl.enableVertexAttribArray(att);
         return att;
     }
 
     //uniform is the string name of a uniform in the program
     this.getuLoc = function (uniform) {
-        return gl.getUniformLocation(this.prgm, uniform);
+        return this.gl.getUniformLocation(this.prgm, uniform);
     }
 }
 
-function initBuffer(gl) {
+function glResourceMgr() {
+    var waiting = 0;
+    var ready = 0;
+    var runreq = false;
+    this.onReady = undefined;
 
+    function addReady(){
+        ready += 1;
+        if (runreq) {
+            this.run();
+        }
+    }
+
+    this.run = function () {
+        if (ready == waiting) {
+            this.onReady();
+        }
+        else {
+            runreq = true;
+        }
+    };
+
+    this.loadImage = function (img, into) {
+        var caller = this;
+        into.onload = function () {
+            addReady.call(caller);
+        }
+        into.src = img;
+    };
+
+    // file is the URL of the file to load, and into is an Object to store the loaded file into
+    this.loadFile = function (file, into) {
+        var caller = this;
+        var req = new XMLHttpRequest;
+        waiting += 1;
+        req.onload = function () {
+            //if (req.readyState == 4) {
+                into.text = req.responseText;
+                addReady.call(caller);
+            //}
+        };
+        req.open("GET", file, true);
+        req.send();
+    };
 }
 
 // set up the WebGL context
