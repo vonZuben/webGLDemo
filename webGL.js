@@ -72,13 +72,32 @@ function glShaderProgram(gl, vertSrc, fragSrc){
     this.fragShdr = gl.createShader(gl.FRAGMENT_SHADER);
 
     this.initPrgm = function () {
+        var good = true;
+
         this.gl.shaderSource(this.vertShdr, this.vertSrc);
         this.gl.shaderSource(this.fragShdr, this.fragSrc);
+
         this.gl.compileShader(this.vertShdr);
         this.gl.compileShader(this.fragShdr);
+
+        if (!this.gl.getShaderParameter(this.vertShdr, gl.COMPILE_STATUS)) {
+            console.log(this.gl.getShaderInfoLog(this.vertShdr));
+            good = false;
+        }
+        if (!this.gl.getShaderParameter(this.fragShdr, gl.COMPILE_STATUS)) {
+            console.log(this.gl.getShaderInfoLog(this.fragShdr));
+            good = false;
+        }
+
         this.gl.attachShader(this.prgm, this.vertShdr);
         this.gl.attachShader(this.prgm, this.fragShdr);
         this.gl.linkProgram(this.prgm);
+
+        if (!this.gl.getProgramParameter(this.prgm, gl.LINK_STATUS)) {
+            console.log(this.gl.getProgramInfoLog(this.prgm))
+            good = false;
+        }
+        return good;
     }
 
     this.usePrgm = function () {
