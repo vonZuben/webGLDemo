@@ -40,15 +40,15 @@ function glTexture(gl, target, minf, magf) {
 
     // the documentation is in webGL quick reference card on Khronos website
     // this is just a object oriented implementation
-    this.texImage2D = function (level, infmt, width, height, brdr, fmt, type, data) {
+    this.texData2D = function (level, infmt, width, height, brdr, fmt, type, data) {
         this.bindTexture();
         this.gl.texImage2D(this.target, level, infmt, width, height, brdr, fmt, type, data);
     }
 
-    //this.texImage2D = function (level, infmt, fmt, type, data) {
-    //    this.bindTexture();
-    //    this.gl.texImage2D(this.target, level, infmt, fmt, type, data);
-    //}
+    this.texImage2D = function (level, infmt, fmt, type, image) {
+        this.bindTexture();
+        this.gl.texImage2D(this.target, level, infmt, fmt, type, image);
+    }
 
     this.setParams = function () {
         this.bindTexture();
@@ -72,13 +72,32 @@ function glShaderProgram(gl, vertSrc, fragSrc){
     this.fragShdr = gl.createShader(gl.FRAGMENT_SHADER);
 
     this.initPrgm = function () {
+        var good = true;
+
         this.gl.shaderSource(this.vertShdr, this.vertSrc);
         this.gl.shaderSource(this.fragShdr, this.fragSrc);
+
         this.gl.compileShader(this.vertShdr);
         this.gl.compileShader(this.fragShdr);
+
+        if (!this.gl.getShaderParameter(this.vertShdr, gl.COMPILE_STATUS)) {
+            console.log(this.gl.getShaderInfoLog(this.vertShdr));
+            good = false;
+        }
+        if (!this.gl.getShaderParameter(this.fragShdr, gl.COMPILE_STATUS)) {
+            console.log(this.gl.getShaderInfoLog(this.fragShdr));
+            good = false;
+        }
+
         this.gl.attachShader(this.prgm, this.vertShdr);
         this.gl.attachShader(this.prgm, this.fragShdr);
         this.gl.linkProgram(this.prgm);
+
+        if (!this.gl.getProgramParameter(this.prgm, gl.LINK_STATUS)) {
+            console.log(this.gl.getProgramInfoLog(this.prgm))
+            good = false;
+        }
+        return good;
     }
 
     this.usePrgm = function () {
@@ -93,18 +112,61 @@ function glShaderProgram(gl, vertSrc, fragSrc){
     //attrib is string name of vertexAttribPointer in the program
     this.enableVAA = function (attrib) {
         var att = this.getAttLoc(attrib);
-        gl.enableVertexAttribArray(att);
+        this.gl.enableVertexAttribArray(att);
         return att;
     }
 
     //uniform is the string name of a uniform in the program
     this.getuLoc = function (uniform) {
-        return gl.getUniformLocation(this.prgm, uniform);
+        return this.gl.getUniformLocation(this.prgm, uniform);
     }
 }
 
-function initBuffer(gl) {
+function glResourceMgr() {
+    var waiting = 0;
+    var ready = 0;
+    var runreq = false;
+    this.onReady = undefined;
 
+    function addReady(){
+        ready += 1;
+        if (runreq) {
+            this.run();
+        }
+    }
+
+    this.run = function () {
+        if (ready == waiting) {
+            this.onReady();
+        }
+        else {
+            runreq = true;
+        }
+    };
+
+    this.loadImage = function (img, into) {
+        var caller = this;
+        waiting += 1;
+        into.onload = function () {
+            addReady.call(caller);
+        }
+        into.src = img;
+    };
+
+    // file is the URL of the file to load, and into is an Object to store the loaded file into
+    this.loadFile = function (file, into) {
+        var caller = this;
+        var req = new XMLHttpRequest;
+        waiting += 1;
+        req.onload = function () {
+            //if (req.readyState == 4) {
+                into.text = req.responseText;
+                addReady.call(caller);
+            //}
+        };
+        req.open("GET", file, true);
+        req.send();
+    };
 }
 
 // set up the WebGL context
@@ -130,5 +192,6 @@ function main(){
     //simpleGL(gl);
     //perspecGL(gl);
     //animSimpleGL(gl);
-    colorGL(gl);
+    //colorGL(gl);
+    textureGL(gl);
 }
