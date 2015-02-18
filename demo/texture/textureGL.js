@@ -40,6 +40,8 @@ function textureGL(gl) {
     mat4.identity(translate);
     mat4.translate(translate, [ -1.0, 0.0, -5.0 ]);
 
+    var tUniLoc;
+
     var r = 0.0;
     function draw() {
         requestAnimationFrame(draw);
@@ -48,13 +50,13 @@ function textureGL(gl) {
         mat4.identity(translate);
         mat4.translate(translate, [ -1.5, 1.0, -5.0 ]);
         mat4.rotateY(translate, r);
-        gl.uniformMatrix4fv(shdrPrgm.getuLoc("translate"), false, translate);
+        gl.uniformMatrix4fv(tUniLoc, false, translate);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
         mat4.identity(translate);
         mat4.translate(translate, [ -0.5, -1.0, -5.0 ]);
         mat4.rotateY(translate, 3.14 + r);
-        gl.uniformMatrix4fv(shdrPrgm.getuLoc("translate"), false, translate);
+        gl.uniformMatrix4fv(tUniLoc, false, translate);
         gl.drawArrays(gl.TRIANGLE_STRIP, 4, 4);
 
         r += 0.01
@@ -71,6 +73,7 @@ function textureGL(gl) {
         gl.vertexAttribPointer(shdrPrgm.enableVAA("pos"), 3, gl.FLOAT, false, 20, 0);
         gl.vertexAttribPointer(shdrPrgm.enableVAA("tpos"), 2, gl.FLOAT, false, 20, 12);
         gl.uniformMatrix4fv(shdrPrgm.getuLoc("perspec"), false, perspec);
+        tUniLoc = shdrPrgm.getuLoc("translate");
 
         // texture ready
         gl.activeTexture(gl.TEXTURE0);
@@ -78,7 +81,7 @@ function textureGL(gl) {
         tex.setParams();
         gl.uniform1i(shdrPrgm.getuLoc("samp"), 0);
 
-        gl.enable(gl.CULL_FACE);
+        //gl.enable(gl.CULL_FACE);
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         draw();
     }
