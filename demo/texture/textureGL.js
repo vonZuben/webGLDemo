@@ -10,13 +10,13 @@ function textureGL(canvas) {
     var shdrPrgm;
     var fragSrc = new Object;
     var vertSrc = new Object;
-    loader.loadFile("demo/texture/frag.fs", fragSrc);
-    loader.loadFile("demo/texture/vert.vs", vertSrc);
+    loader.loadFile("frag.fs", fragSrc);
+    loader.loadFile("vert.vs", vertSrc);
 
     //texture vars
     var img = new Image;
     var tex = new glTexture(gl, gl.TEXTURE_2D, gl.LINEAR, gl.LINEAR);
-    loader.loadImage("demo/texture/ryukoFace.png", img);
+    loader.loadImage("ryukoFace.png", img);
 
     //buffer vars
     var buf = new glBuffer(gl, gl.ARRAY_BUFFER, gl.STATIC_DRAW);

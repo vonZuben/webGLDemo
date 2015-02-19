@@ -184,11 +184,3 @@ function initGL(canvas) {
     gl.height = canv.height;
     return gl;
 }
-
-function main(){
-    //simpleGL("canv");
-    //perspecGL("canv");
-    //animSimpleGL("canv");
-    //colorGL("canv");
-    textureGL("canv");
-}
