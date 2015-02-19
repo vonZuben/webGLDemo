@@ -21,7 +21,9 @@ function getvs() {
 }
 
 
-function colorGL(gl) {
+function colorGL(canvas) {
+
+    var gl = initGL(canvas);
 
     var vss = getvs();
     var fss = getfs();

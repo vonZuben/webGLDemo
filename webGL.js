@@ -171,27 +171,24 @@ function glResourceMgr() {
 
 // set up the WebGL context
 function initGL(canvas) {
-    var gl = canvas.getContext("experimental-webgl");
+    var canv = document.getElementById(canvas);
+
+    var gl = canv.getContext("experimental-webgl");
 
     if (gl == null){
         alert("no webgl suport");
         return null;
     }
 
-    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.width = canv.width;
+    gl.height = canv.height;
     return gl;
 }
 
 function main(){
-    var canv = document.getElementById("canv");
-
-    var gl = initGL(canv);
-
-    //testing
-
-    //simpleGL(gl);
-    //perspecGL(gl);
-    //animSimpleGL(gl);
-    //colorGL(gl);
-    textureGL(gl);
+    //simpleGL("canv");
+    //perspecGL("canv");
+    //animSimpleGL("canv");
+    //colorGL("canv");
+    textureGL("canv");
 }

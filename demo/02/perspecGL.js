@@ -17,7 +17,9 @@ function getFragSh() {
     ";
 }
 
-function perspecGL(gl) {
+function perspecGL(canvas) {
+
+    var gl = initGL(canvas);
 
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
@@ -50,7 +52,7 @@ function perspecGL(gl) {
 
     // set the perspective uniform in the shader
     var persp = mat4.create();
-    mat4.perspective(45, 800 / 500 , 0.1, 100, persp);
+    mat4.perspective(45, gl.width / gl.height , 0.1, 100, persp);
     gl.uniformMatrix4fv(simpleShdr.getuLoc("persp"), false, persp);
 
     // clear and draw to the bound frameBuffer (screen by default)

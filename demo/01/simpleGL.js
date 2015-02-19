@@ -16,7 +16,9 @@ function getFragSh() {
     ";
 }
 
-function simpleGL(gl) {
+function simpleGL(canvas) {
+
+    var gl = initGL(canvas);
 
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
 

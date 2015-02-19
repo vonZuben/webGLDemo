@@ -19,7 +19,9 @@ function getFragSh() {
     ";
 }
 
-function animSimpleGL(gl) {
+function animSimpleGL(canvas) {
+
+    var gl = initGL(canvas);
 
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
@@ -52,7 +54,7 @@ function animSimpleGL(gl) {
 
     // set the perspective uniform in the shader
     var persp = mat4.create();
-    mat4.perspective(45, 800 / 500 , 0.1, 100, persp);
+    mat4.perspective(45, gl.width / gl.height , 0.1, 100, persp);
     gl.uniformMatrix4fv(simpleShdr.getuLoc("persp"), false, persp);
 
     // set up matricies for animation, want to rotate on Y axis so rotate then translate (see shader)

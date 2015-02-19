@@ -1,5 +1,7 @@
 
-function textureGL(gl) {
+function textureGL(canvas) {
+
+    var gl = initGL(canvas);
 
     // resource loader
     var loader = new glResourceMgr;
@@ -34,7 +36,7 @@ function textureGL(gl) {
 
     // uniforms
     var perspec = mat4.create();
-    mat4.perspective(45, 1000 / 600, 0.1, 100, perspec);
+    mat4.perspective(45, gl.width / gl.height, 0.1, 100, perspec);
 
     var translate = mat4.create();
     mat4.identity(translate);
