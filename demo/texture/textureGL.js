@@ -7,7 +7,7 @@ function textureGL(canvas) {
     var loader = new glResourceMgr;
 
     // shader vars
-    var shdrPrgm;
+    var shdrPrgm = new glShaderProgram(gl);
     var fragSrc = new Object;
     var vertSrc = new Object;
     loader.loadFile("frag.fs", fragSrc);
@@ -67,8 +67,7 @@ function textureGL(canvas) {
     // could use more than one to be more efficient in more complex example
     loader.onReady = function() {
         // shdr ready
-        shdrPrgm = new glShaderProgram(gl, vertSrc.text, fragSrc.text);
-        shdrPrgm.initPrgm();
+        shdrPrgm.initPrgm(vertSrc.text, fragSrc.text);
         shdrPrgm.usePrgm();
 
         buf.bindBuffer();

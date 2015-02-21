@@ -63,15 +63,18 @@ function glTexture(gl, target, minf, magf) {
 }
 
 //takes gl context and a list of shader source strings to be compiled onto the program
-function glShaderProgram(gl, vertSrc, fragSrc){
+function glShaderProgram(gl){
     this.prgm = gl.createProgram();
     this.gl = gl;
-    this.vertSrc = vertSrc;
-    this.fragSrc = fragSrc;
+    this.vertSrc = undefined;
+    this.fragSrc = undefined;
     this.vertShdr = gl.createShader(gl.VERTEX_SHADER);
     this.fragShdr = gl.createShader(gl.FRAGMENT_SHADER);
 
-    this.initPrgm = function () {
+    this.initPrgm = function (vertSrc, fragSrc) {
+        this.vertSrc = vertSrc;
+        this.fragSrc = fragSrc;
+
         var good = true;
 
         this.gl.shaderSource(this.vertShdr, this.vertSrc);

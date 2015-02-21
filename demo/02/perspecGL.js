@@ -35,8 +35,8 @@ function perspecGL(canvas) {
     var fs = getFragSh();
 
     // make the shader program and be sure to usePrgm()
-    var simpleShdr = new glShaderProgram(gl, vs, fs);
-    simpleShdr.initPrgm();
+    var simpleShdr = new glShaderProgram(gl);
+    simpleShdr.initPrgm(vs, fs);
     simpleShdr.usePrgm();
 
     // make vertex buffer for shader program attribute needs

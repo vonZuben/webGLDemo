@@ -28,8 +28,8 @@ function colorGL(canvas) {
     var vss = getvs();
     var fss = getfs();
 
-    var shdrp = new glShaderProgram(gl, vss, fss);
-    shdrp.initPrgm();
+    var shdrp = new glShaderProgram(gl);
+    shdrp.initPrgm(vss, fss);
     shdrp.usePrgm();
 
     var vertPos = shdrp.enableVAA("aVertexPosition");
