@@ -150,7 +150,7 @@ function glObj() {
             var element = elems.split(' ');
             element.shift();
             return element.map(function (e) {
-                return Number(e);
+                return Number(e) - 1;
             });
         });
 
