@@ -125,6 +125,41 @@ function glShaderProgram(gl){
     }
 }
 
+function glObj() {
+    this.vertArrayList = [];
+    this.elemArrayList = [];
+
+    this.parseOBJ = function (file) {
+        var vertexMatches = file.match(/^v( -?\d+(\.\d+)?){3}$/gm);
+
+        var verticies = vertexMatches.map(function (verts) {
+            var vertex = verts.split(' ');
+            vertex.shift(); // get rid og the v
+            return vertex.map(function (v) {
+                return Number(v);
+            });
+        });
+
+        for (v in verticies) {
+            this.vertArrayList = this.vertArrayList.concat(verticies[v]);
+        }
+
+        var elementMatches = file.match(/^f( \d+)+$/gm);
+
+        var elements = elementMatches.map(function (elems) {
+            var element = elems.split(' ');
+            element.shift();
+            return element.map(function (e) {
+                return Number(e);
+            });
+        });
+
+        for (e in elements) {
+            this.elemArrayList = this.elemArrayList.concat(elements[e]);
+        }
+    }
+}
+
 function glResourceMgr() {
     var waiting = 0;
     var ready = 0;
