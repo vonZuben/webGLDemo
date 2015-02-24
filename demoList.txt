@@ -3,3 +3,4 @@ demo/02/demo.html
 demo/03/demo.html
 demo/04/demo.html
 demo/texture/demo.html
+demo/obj/demo.html
