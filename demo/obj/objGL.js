@@ -6,7 +6,7 @@ function objGL(canvas) {
 
     var obj = new glObj;
     var objFile = new Object;
-    loader.loadFile("webGLdemo.obj", objFile);
+    loader.loadFile("../resources/webGLdemo.obj", objFile);
 
     var shdr = new glShaderProgram(gl);
     var vsrc = new Object;
