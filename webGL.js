@@ -126,37 +126,118 @@ function glShaderProgram(gl){
 }
 
 function glObj() {
-    this.vertArrayList = [];
-    this.elemArrayList = [];
+    this.verticies = []; // array of vertices (3 element arrays)
+    this.normals = []; // normals array like ^
+    this.uvs = []; // texture coordinates
+    this.faces = []; //indices to match verts, normal, and uvs
 
-    this.parseOBJ = function (file) {
+    function element() {
+        this.v = undefined;
+        this.vt = undefined;
+        this.vn = undefined;
+    }
+
+    //this.elements = []; // array of vertex indices
+
+    this.vertexArray = function () { // return the vertices a tightly packed vertex array
+        var vArray = [];
+        for (v in this.verticies) {
+            vArray = vArray.concat(this.verticies[v]);
+        }
+        return vArray;
+    }
+
+    this.vertexIndices = function () {
+        var vertexIArray = [];
+        for (f in this.faces){
+            for (vi in this.faces[f]) {
+                vertexIArray.push(this.faces[f][vi].v);
+            }
+        }
+        return vertexIArray;
+    }
+
+    function parseVertices(file) {
         var vertexMatches = file.match(/^v( -?\d+(\.\d+)?){3}$/gm);
 
-        var verticies = vertexMatches.map(function (verts) {
+        this.verticies = vertexMatches.map(function (verts) {
             var vertex = verts.split(' ');
             vertex.shift(); // get rid og the v
             return vertex.map(function (v) {
                 return Number(v);
             });
         });
+    }
 
-        for (v in verticies) {
-            this.vertArrayList = this.vertArrayList.concat(verticies[v]);
-        }
+    function parseNormals(file) {
+        var normalMatches = file.match(/^vn( -?\d+(\.\d+)?){3}$/gm);
 
-        var elementMatches = file.match(/^f( \d+)+$/gm);
-
-        var elements = elementMatches.map(function (elems) {
-            var element = elems.split(' ');
-            element.shift();
-            return element.map(function (e) {
-                return Number(e) - 1;
+        this.normals = normalMatches.map(function (normals) {
+            var normal = normals.split(' ');
+            normal.shift(); // get rid og the vn
+            return normal.map(function (n) {
+                return Number(n);
             });
         });
+    }
 
-        for (e in elements) {
-            this.elemArrayList = this.elemArrayList.concat(elements[e]);
-        }
+    function parseFaces(file) {
+        var faceMatches = file.match(/^f( (\/?\d*){1,3}){3}$/gm); // expect triangle faces
+
+        this.faces = faceMatches.map(function (faceM) {
+            var face = faceM.split(/[\s\/]+/);
+            face.shift(); //get rid of the f
+
+            face = face.map(function (f) {
+                return Number(f) - 1;
+            });
+
+            var elem1 = new element;
+            var elem2 = new element;
+            var elem3 = new element;
+            // check what face info is given ie. v1 v2 v3, v1/vt1 ..., v1/vt1/vn1... , v1//vn1
+            if (face.length == 3) {                 // v1...
+                elem1.v = face[0];
+                elem2.v = face[1];
+                elem3.v = face[2];
+            }
+            else if (face.length == 6) {            // v1/vt1 or v1//vn1
+                elem1.v = face[0];
+                elem2.v = face[2];
+                elem3.v = face[4];
+                if (/\/\//g.test(faceM) == true) {  // v1//vn1
+                    elem1.vn = face[1];
+                    elem2.vn = face[3];
+                    elem3.vn = face[5];
+                }
+                else {                              // v1/vt
+                    elem1.vt = face[1];
+                    elem2.vt = face[3];
+                    elem3.vt = face[5];
+                }
+            }
+            else if (face.length == 9) {            // v1/vt/vn
+                elem1.v = face[0];
+                elem2.v = face[3];
+                elem3.v = face[6];
+
+                elem1.vt = face[1];
+                elem2.vt = face[4];
+                elem3.vt = face[7];
+
+                elem1.vn = face[2];
+                elem2.vn = face[5];
+                elem3.vn = face[8];
+            }
+
+            return [ elem1, elem2, elem3 ];
+        });
+    }
+
+    this.parseOBJ = function (file) {
+        parseVertices.call(this, file);
+        parseNormals.call(this, file);
+        parseFaces.call(this, file);
     }
 }
 
