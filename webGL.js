@@ -126,10 +126,13 @@ function glShaderProgram(gl){
 }
 
 function glObj() {
-    this.verticies = []; // array of vertices (3 element arrays)
+    this.vertices = []; // array of vertices (3 element arrays) [ [ x, y, z] , ... ]
     this.normals = []; // normals array like ^
-    this.uvs = []; // texture coordinates
-    this.faces = []; //indices to match verts, normal, and uvs
+    this.uvs = []; // texture coordinates [ [u, v], ... ]
+
+    //indices to match verts, normal, and uvs
+    // [ [ element1, element2, element3 ], ... ] | element = { v; vt; vn; };
+    this.faces = [];
 
     function element() {
         this.v = undefined;
@@ -145,6 +148,18 @@ function glObj() {
             vArray = vArray.concat(this.verticies[v]);
         }
         return vArray;
+    }
+
+    this.vertnormArray = function () { // return tightly packed vertex with normals
+        var vnArray = [];
+
+        for (f in this.faces){
+            for (vi in this.faces[f]) {
+                vnArray = vnArray.concat(this.verticies[this.faces[f][vi].v]);
+                vnArray = vnArray.concat(this.normals[this.faces[f][vi].vn]);
+            }
+        }
+        return vnArray;
     }
 
     this.vertexIndices = function () {
