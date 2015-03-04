@@ -23,7 +23,7 @@ function objGL(canvas) {
         mat4.rotateY(rot, 0.01);
         mat4.rotateX(rot, 0.005);
         gl.uniformMatrix4fv(rotLoc, false, rot);
-        gl.drawElements(gl.TRIANGLES, obj.faces.length * 3, gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(gl.TRIANGLES, obj.numVerts(), gl.UNSIGNED_SHORT, 0);
     }
 
     var persp = mat4.create();
@@ -43,12 +43,12 @@ function objGL(canvas) {
         shdr.usePrgm();
 
         // load the buffers with the .obj file
-        obj.parseOBJ(objFile.text);
+        obj.parse(objFile.text);
 
         // only have one buffer for each target so dont have to wory about which one is bound
         // bufferData call from glBuffer does it for me
-        bufVert.bufferData(new Float32Array(obj.vertexArray()));
-        bufElem.bufferData(new Uint16Array(obj.vertexIndices()));
+        bufVert.bufferData(obj.vertexArray());
+        bufElem.bufferData(obj.vertexIndices());
 
         gl.vertexAttribPointer(shdr.enableVAA("pos"), 3, gl.FLOAT, false, 0, 0);
 
