@@ -1,11 +1,4 @@
-function glObj() {
-    this.vertices = []; // array of vertices (3 element arrays) [ [ x, y, z] , ... ]
-    this.normals = []; // normals array like ^
-    this.uvs = []; // texture coordinates [ [u, v], ... ]
-
-    //indices to match verts, normal, and uvs
-    // [ [ element1, element2, element3 ], ... ] | element = { v; vt; vn; };
-    this.faces = [];
+function objParser() {
 
     function element() {
         this.v = undefined;
@@ -13,39 +6,7 @@ function glObj() {
         this.vn = undefined;
     }
 
-    //this.elements = []; // array of vertex indices
-
-    this.vertexArray = function () { // return the vertices a tightly packed vertex array
-        var vArray = [];
-        for (v in this.verticies) {
-            vArray = vArray.concat(this.verticies[v]);
-        }
-        return vArray;
-    }
-
-    this.vertnormArray = function () { // return tightly packed vertex with normals
-        var vnArray = [];
-
-        for (f in this.faces){
-            for (vi in this.faces[f]) {
-                vnArray = vnArray.concat(this.verticies[this.faces[f][vi].v]);
-                vnArray = vnArray.concat(this.normals[this.faces[f][vi].vn]);
-            }
-        }
-        return vnArray;
-    }
-
-    this.vertexIndices = function () {
-        var vertexIArray = [];
-        for (f in this.faces){
-            for (vi in this.faces[f]) {
-                vertexIArray.push(this.faces[f][vi].v);
-            }
-        }
-        return vertexIArray;
-    }
-
-    function parseVertices(file) {
+   function parseVertices(file) {
         var vertexMatches = file.match(/^v( -?\d+(\.\d+)?){3}$/gm);
 
         this.verticies = vertexMatches.map(function (verts) {
@@ -122,9 +83,62 @@ function glObj() {
         });
     }
 
-    this.parseOBJ = function (file) {
+    this.parse = function (file) {
         parseVertices.call(this, file);
         parseNormals.call(this, file);
         parseFaces.call(this, file);
+    }
+}
+
+// this expects everything to be triangulated
+function glObj() {
+    var parser = new objParser;
+
+    this.vertices = []; // array of vertices (3 element arrays) [ [ x, y, z] , ... ]
+    this.normals = []; // normals array like ^
+    this.uvs = []; // texture coordinates [ [u, v], ... ]
+
+    //indices to match verts, normal, and uvs
+    // [ [ element1, element2, element3 ], ... ] | element = { v; vt; vn; };
+    this.faces = [];
+
+    this.parse = function(file) {
+        parser.parse.call(this, file);
+    }
+
+    // building arrays with the face indicies in order. This means that the element array buffer
+    // needs to be an incremental sequence eg 0, 1, 2, ... n
+
+    this.vertexArray = function () { // return the vertices a tightly packed vertex array
+        var vArray = [];
+        for (f in this.faces){
+            for (vi in this.faces[f]) {
+                vArray = vArray.concat(this.verticies[this.faces[f][vi].v]);
+            }
+        }
+        return new Float32Array(vArray);
+    }
+
+    this.vertnormArray = function () { // return tightly packed vertex with normals
+        var vnArray = [];
+        for (f in this.faces){
+            for (vi in this.faces[f]) {
+                vnArray = vnArray.concat(this.verticies[this.faces[f][vi].v]);
+                vnArray = vnArray.concat(this.normals[this.faces[f][vi].vn]);
+            }
+        }
+        return new Float32Array(vnArray);
+    }
+
+    this.numVerts = function() {
+        return this.faces.length * 3;
+    }
+
+    this.vertexIndices = function () {
+        var elements = [];
+        for (var i = 0; i < this.faces.length * 3; i += 1) {
+            elements.push(i);
+        }
+        return new Uint16Array(elements);
     }
 }
