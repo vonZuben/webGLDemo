@@ -5,3 +5,4 @@ demo/04/demo.html
 demo/texture/demo.html
 demo/obj/demo.html
 demo/simpleLighting/demo.html
+demo/normalColors/demo.html
