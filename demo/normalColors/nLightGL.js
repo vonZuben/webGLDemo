@@ -49,8 +49,8 @@ function nLightGL(canvas) {
         // bufferData call from glBuffer does it for me
         var verts = obj.vertnormArray();
         var elements = obj.vertexIndices();
-        bufVert.bufferData(new Float32Array(verts));
-        bufElem.bufferData(new Uint16Array(elements));
+        bufVert.bufferData(verts);
+        bufElem.bufferData(elements);
 
         gl.vertexAttribPointer(shdr.enableVAA("pos"), 3, gl.FLOAT, false, 24, 0);
         gl.vertexAttribPointer(shdr.enableVAA("normal"), 3, gl.FLOAT, false, 24, 12);
