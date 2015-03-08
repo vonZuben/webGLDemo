@@ -6,10 +6,15 @@ function objParser() {
         this.vn = undefined;
     }
 
-   function parseVertices(file) {
+    this.parseVertices = function (file) {
         var vertexMatches = file.match(/^v( -?\d+(\.\d+)?){3}$/gm);
 
-        this.verticies = vertexMatches.map(function (verts) {
+        if (!vertexMatches){
+            console.log("no verticies in " + file.match(/^.*$/)[0]); // should print the first line of the obj file
+            return;
+        }
+
+        this.fileVertices = vertexMatches.map(function (verts) {
             var vertex = verts.split(' ');
             vertex.shift(); // get rid og the v
             return vertex.map(function (v) {
@@ -18,10 +23,15 @@ function objParser() {
         });
     }
 
-    function parseNormals(file) {
+    this.parseNormals = function (file) {
         var normalMatches = file.match(/^vn( -?\d+(\.\d+)?){3}$/gm);
 
-        this.normals = normalMatches.map(function (normals) {
+        if (!normalMatches){
+            console.log("no normals in " + file.match(/^.*$/)[0]); // should print the first line of the obj file
+            return;
+        }
+
+        this.fileNormals = normalMatches.map(function (normals) {
             var normal = normals.split(' ');
             normal.shift(); // get rid og the vn
             return normal.map(function (n) {
@@ -30,8 +40,13 @@ function objParser() {
         });
     }
 
-    function parseFaces(file) {
+    function parseFaces (file) {
         var faceMatches = file.match(/^f( (\/?\d*){1,3}){3}$/gm); // expect triangle faces
+
+        if (!faceMatches){
+            console.log("no faces in " + file.match(/^.*$/)[0]); // should print the first line of the obj file
+            return;
+        }
 
         this.faces = faceMatches.map(function (faceM) {
             var face = faceM.split(/[\s\/]+/);
@@ -83,58 +98,84 @@ function objParser() {
         });
     }
 
-    this.parse = function (file) {
-        parseVertices.call(this, file);
-        parseNormals.call(this, file);
-        parseFaces.call(this, file);
+    this.init = function (file) {
+        parseFaces.call(this, file); // need faces to do anything
     }
 }
 
 // this expects everything to be triangulated
 function glObj() {
     var parser = new objParser;
+    var file = undefined;
 
-    this.vertices = []; // array of vertices (3 element arrays) [ [ x, y, z] , ... ]
-    this.normals = []; // normals array like ^
-    this.uvs = []; // texture coordinates [ [u, v], ... ]
+    // al the object properties are defined as shown after initialization by the parser
+    this.fileVertices = undefined; // array of vertices (3 element arrays) [ [ x, y, z] , ... ]
+    this.fileNormals = undefined; // normals array like ^
+    this.fileUVs = undefined; // texture coordinates [ [u, v], ... ]
 
     //indices to match verts, normal, and uvs
     // [ [ element1, element2, element3 ], ... ] | element = { v; vt; vn; };
-    this.faces = [];
+    this.faces = undefined;
 
-    this.parse = function(file) {
-        parser.parse.call(this, file);
-    }
-
-    // building arrays with the face indicies in order. This means that the element array buffer
-    // needs to be an incremental sequence eg 0, 1, 2, ... n
-
-    this.vertexArray = function () { // return the vertices a tightly packed vertex array
-        var vArray = [];
-        for (f in this.faces){
-            for (vi in this.faces[f]) {
-                vArray = vArray.concat(this.verticies[this.faces[f][vi].v]);
-            }
-        }
-        return new Float32Array(vArray);
-    }
-
-    this.vertnormArray = function () { // return tightly packed vertex with normals
-        var vnArray = [];
-        for (f in this.faces){
-            for (vi in this.faces[f]) {
-                vnArray = vnArray.concat(this.verticies[this.faces[f][vi].v]);
-                vnArray = vnArray.concat(this.normals[this.faces[f][vi].vn]);
-            }
-        }
-        return new Float32Array(vnArray);
+    this.init = function(infile) {
+        file = infile;
+        parser.init.call(this, file);
     }
 
     this.numVerts = function() {
         return this.faces.length * 3;
     }
 
-    this.vertexIndices = function () {
+    // generate glType arrays for buffers
+    // generated based on the faces array so everything is aligned
+    // eg. every array has the same number of elements and can be put
+    // into one buffer for attributes
+
+    this.vertexArray = function () { // Float32Array of vertices, must be multiple of 3
+        if (!this.fileVertices) {
+            parser.parseVertices.call(this, file);
+        }
+
+        var array = [];
+
+        for (f in this.faces){
+            for (v in this.faces[f]) {
+                array = array.concat(this.fileVertices[this.faces[f][v].v]);
+            }
+        }
+
+        return new Float32Array(array);
+    }
+
+    this.uvArray = function () { // Float32Array of uv coordinates, must be multiple of 2
+        //if (!this.fileUVs) {
+        //    parser.parse.call(this, file);
+        //}
+    }
+
+    this.normalArray = function () { // Float32Array of normals as they are in the obj file, must be multiple of 3
+        if (!this.fileNormals) {
+            parser.parseNormals.call(this, file);
+        }
+
+        var array = [];
+
+        for (f in this.faces){
+            for (v in this.faces[f]) {
+                array = array.concat(this.fileNormals[this.faces[f][v].vn]);
+            }
+        }
+
+        return new Float32Array(array);
+    }
+
+    this.calcFlatNormals = function () { // generate flat normals for each vertex
+    }
+
+    this.calcSmoothNormals = function () { // generate smooth normals for each vertex
+    }
+
+    this.elements = function () {
         var elements = [];
         for (var i = 0; i < this.faces.length * 3; i += 1) {
             elements.push(i);
