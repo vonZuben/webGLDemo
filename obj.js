@@ -170,6 +170,29 @@ function glObj() {
     }
 
     this.calcFlatNormals = function () { // generate flat normals for each vertex
+        if (!this.fileVertices) {
+            parser.parseVertices.call(this, file);
+        }
+
+        var array = [];
+
+        for (f in this.faces) {
+            var v1 = vec3.create(this.fileVertices[this.faces[f][0].v]);
+            var v2 = vec3.create(this.fileVertices[this.faces[f][1].v]);
+            var v3 = vec3.create(this.fileVertices[this.faces[f][2].v]);
+
+            var v12 = vec3.subtract(v2, v1);
+            var v13 = vec3.subtract(v3, v1);
+
+            var normal = vec3.cross(v12, v13);
+
+            for (v in this.faces[f]) {
+                array = array.concat(normal[0]);
+                array = array.concat(normal[1]);
+                array = array.concat(normal[2]);
+            }
+        }
+        return new Float32Array(array)
     }
 
     this.calcSmoothNormals = function () { // generate smooth normals for each vertex
