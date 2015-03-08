@@ -185,5 +185,6 @@ function initGL(canvas) {
 
     gl.width = canv.width;
     gl.height = canv.height;
+    gl.canvas = canv;
     return gl;
 }
