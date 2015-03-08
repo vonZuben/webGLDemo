@@ -43,12 +43,12 @@ function sLightGL(canvas) {
         shdr.usePrgm();
 
         // load the buffers with the .obj file
-        obj.parse(objFile.text);
+        obj.init(objFile.text);
 
         // only have one buffer for each target so dont have to wory about which one is bound
         // bufferData call from glBuffer does it for me
         var verts = obj.vertexArray();
-        var elements = obj.vertexIndices();
+        var elements = obj.elements();
         bufVert.bufferData(verts);
         bufElem.bufferData(elements);
 

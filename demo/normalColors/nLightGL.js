@@ -15,6 +15,7 @@ function nLightGL(canvas) {
     loader.loadFile("frag.fs", fsrc);
 
     var bufVert = new glBuffer(gl, gl.ARRAY_BUFFER, gl.STATIC_DRAW);
+    var bufNorm = new glBuffer(gl, gl.ARRAY_BUFFER, gl.STATIC_DRAW);
     var bufElem = new glBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, gl.STATIC_DRAW);
 
     var draw = function () {
@@ -43,17 +44,22 @@ function nLightGL(canvas) {
         shdr.usePrgm();
 
         // load the buffers with the .obj file
-        obj.parse(objFile.text);
+        obj.init(objFile.text);
 
         // only have one buffer for each target so dont have to wory about which one is bound
         // bufferData call from glBuffer does it for me
-        var verts = obj.vertnormArray();
-        var elements = obj.vertexIndices();
+        var verts = obj.vertexArray();
+        var normals = obj.normalArray();
+        var elements = obj.elements();
+
         bufVert.bufferData(verts);
+        gl.vertexAttribPointer(shdr.enableVAA("pos"), 3, gl.FLOAT, false, 0, 0);
+
+        bufNorm.bufferData(normals);
+        gl.vertexAttribPointer(shdr.enableVAA("normal"), 3, gl.FLOAT, false, 0, 0);
+
         bufElem.bufferData(elements);
 
-        gl.vertexAttribPointer(shdr.enableVAA("pos"), 3, gl.FLOAT, false, 24, 0);
-        gl.vertexAttribPointer(shdr.enableVAA("normal"), 3, gl.FLOAT, false, 24, 12);
 
         gl.uniformMatrix4fv(shdr.getuLoc("persp"), false, persp);
         gl.uniformMatrix4fv(shdr.getuLoc("trans"), false, trans);

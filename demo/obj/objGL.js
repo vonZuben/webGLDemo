@@ -43,12 +43,12 @@ function objGL(canvas) {
         shdr.usePrgm();
 
         // load the buffers with the .obj file
-        obj.parse(objFile.text);
+        obj.init(objFile.text);
 
         // only have one buffer for each target so dont have to wory about which one is bound
         // bufferData call from glBuffer does it for me
         bufVert.bufferData(obj.vertexArray());
-        bufElem.bufferData(obj.vertexIndices());
+        bufElem.bufferData(obj.elements());
 
         gl.vertexAttribPointer(shdr.enableVAA("pos"), 3, gl.FLOAT, false, 0, 0);
 
