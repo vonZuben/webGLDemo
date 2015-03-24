@@ -17,14 +17,15 @@ function nLightGL(canvas) {
     var bufVert = new glBuffer(gl, gl.ARRAY_BUFFER, gl.STATIC_DRAW);
     var bufElem = new glBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, gl.STATIC_DRAW);
 
+    var elements; // the indices for vertex order while drawing
+
     var draw = function () {
         requestAnimationFrame(draw);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         mat4.rotateY(rot, 0.01);
         mat4.rotateX(rot, 0.005);
         gl.uniformMatrix4fv(rotLoc, false, rot);
-        //gl.drawElements(gl.TRIANGLES, obj.numVerts(), gl.UNSIGNED_SHORT, 0);
-        gl.drawElements(gl.TRIANGLES, 1700, gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(gl.TRIANGLES, elements.length, gl.UNSIGNED_SHORT, 0);
     }
 
     var persp = mat4.create();
@@ -50,17 +51,11 @@ function nLightGL(canvas) {
         // bufferData call from glBuffer does it for me
         var verts = obj.vertexArray();
         var normalsSmooth = obj.normalArray(); // this is just the normals from the file which happen to be smooth
-        var elements = obj.elements();
+        elements = obj.elements();
 
-        var vertData = [];
-        var numVerts = obj.numVerts();
-        for (var i = 0; i < numVerts; i += 3) {
-            vertData = vertData.concat( [ verts[ i + 0 ], verts[ i + 1 ], verts[ i + 2 ], normalsSmooth[ i + 0 ], normalsSmooth[ i + 1 ], normalsSmooth[ i + 2 ] ] );
-        }
-
-        //var vertData = verts.reduce( function (accumulator, vertex, i) {
-        //    return accumulator.concat(vertex.concat(normalsSmooth[i]));
-        //}, []);
+        var vertData = verts.reduce( function (accumulator, vertex, i) {
+            return accumulator.concat(vertex.concat(normalsSmooth[i]));
+        }, []);
         bufVert.bufferData(new Float32Array(vertData));
         gl.vertexAttribPointer(shdr.enableVAA("pos"), 3, gl.FLOAT, false, 24, 0);
         gl.vertexAttribPointer(shdr.enableVAA("normal"), 3, gl.FLOAT, false, 24, 12);

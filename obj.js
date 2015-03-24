@@ -6,13 +6,8 @@ function objParser() {
         this.vn = undefined;
     }
 
-    this.parseVertices = function (file) {
+    function parseVertices  (file) {
         var vertexMatches = file.match(/^v( -?\d+(\.\d+)?){3}$/gm);
-
-        if (!vertexMatches){
-            console.log("no verticies in " + file.match(/^.*$/)[0]); // should print the first line of the obj file
-            return;
-        }
 
         this.fileVertices = vertexMatches.map(function (verts) {
             var vertex = verts.split(' ');
@@ -23,13 +18,8 @@ function objParser() {
         });
     }
 
-    this.parseNormals = function (file) {
+    function parseNormals (file) {
         var normalMatches = file.match(/^vn( -?\d+(\.\d+)?){3}$/gm);
-
-        if (!normalMatches){
-            console.log("no normals in " + file.match(/^.*$/)[0]); // should print the first line of the obj file
-            return;
-        }
 
         this.fileNormals = normalMatches.map(function (normals) {
             var normal = normals.split(' ');
@@ -100,6 +90,8 @@ function objParser() {
 
     this.init = function (file) {
         parseFaces.call(this, file); // need faces to do anything
+        parseVertices.call(this, file);
+        parseNormals.call(this, file);
     }
 }
 
@@ -122,29 +114,17 @@ function glObj() {
         parser.init.call(this, file);
     }
 
-    this.numVerts = function() {
-        return this.faces.length * 3;
-    }
-
-    // generate glType arrays for buffers
-    // generated based on the faces array so everything is aligned
-    // eg. every array has the same number of elements and can be put
-    // into one buffer for attributes
+    // return arrays in the form [ [ ... ], ... ] for vertices normals and uv's
+    // aligned so they can be put made in to arrays for drawing commands
+    // arrays returned from each function for a specific .obj file will all be the same length
+    // elements are returned as a one dimensional array of indices for vertex order
 
     this.vertexArray = function () { // Float32Array of vertices, must be multiple of 3
         if (!this.fileVertices) {
-            parser.parseVertices.call(this, file);
+            console.log("NO VERTICES in " + file.splice("\n")); // print the first line of the file that has a problem
         }
 
-        var array = [];
-
-        for (f in this.faces){
-            for (v in this.faces[f]) {
-                array = array.concat(this.fileVertices[this.faces[f][v].v]);
-            }
-        }
-
-        return new Float32Array(array);
+        return this.fileVertices;
     }
 
     this.uvArray = function () { // Float32Array of uv coordinates, must be multiple of 2
@@ -155,54 +135,26 @@ function glObj() {
 
     this.normalArray = function () { // Float32Array of normals as they are in the obj file, must be multiple of 3
         if (!this.fileNormals) {
-            parser.parseNormals.call(this, file);
+            console.log("NO NORMALS in " + file.splice("\n")); // print the first line of the file that has a problem
         }
 
         var array = [];
+        array.length = this.fileVertices.length;
 
-        for (f in this.faces){
-            for (v in this.faces[f]) {
-                array = array.concat(this.fileNormals[this.faces[f][v].vn]);
-            }
-        }
+        this.faces.forEach( function (face) {
+            face.forEach( function (element) {
+                array[element.v] = this.fileNormals[element.vn];
+            }, this);
+        }, this);
 
-        return new Float32Array(array);
-    }
-
-    this.calcFlatNormals = function () { // generate flat normals for each vertex
-        if (!this.fileVertices) {
-            parser.parseVertices.call(this, file);
-        }
-
-        var array = [];
-
-        for (f in this.faces) {
-            var v1 = vec3.create(this.fileVertices[this.faces[f][0].v]);
-            var v2 = vec3.create(this.fileVertices[this.faces[f][1].v]);
-            var v3 = vec3.create(this.fileVertices[this.faces[f][2].v]);
-
-            var v12 = vec3.subtract(v2, v1);
-            var v13 = vec3.subtract(v3, v1);
-
-            var normal = vec3.cross(v12, v13);
-
-            for (v in this.faces[f]) {
-                array = array.concat(normal[0]);
-                array = array.concat(normal[1]);
-                array = array.concat(normal[2]);
-            }
-        }
-        return new Float32Array(array)
-    }
-
-    this.calcSmoothNormals = function () { // generate smooth normals for each vertex
+        return array;
     }
 
     this.elements = function () {
-        var elements = [];
-        for (var i = 0; i < this.faces.length * 3; i += 1) {
-            elements.push(i);
-        }
-        return new Uint16Array(elements);
+        return this.faces.reduce( function (accumulator, element) {
+            accumulator = accumulator.concat(element[0].v);
+            accumulator = accumulator.concat(element[1].v);
+            return accumulator.concat(element[2].v);
+        }, []);
     }
 }

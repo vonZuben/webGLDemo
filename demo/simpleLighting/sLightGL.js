@@ -17,13 +17,15 @@ function sLightGL(canvas) {
     var bufVert = new glBuffer(gl, gl.ARRAY_BUFFER, gl.STATIC_DRAW);
     var bufElem = new glBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, gl.STATIC_DRAW);
 
+    var elements;
+
     var draw = function () {
         requestAnimationFrame(draw);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         mat4.rotateY(rot, 0.01);
         mat4.rotateX(rot, 0.005);
         gl.uniformMatrix4fv(rotLoc, false, rot);
-        gl.drawElements(gl.TRIANGLES, obj.numVerts(), gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(gl.TRIANGLES, elements.length, gl.UNSIGNED_SHORT, 0);
     }
 
     var persp = mat4.create();
@@ -48,9 +50,9 @@ function sLightGL(canvas) {
         // only have one buffer for each target so dont have to wory about which one is bound
         // bufferData call from glBuffer does it for me
         var verts = obj.vertexArray();
-        var elements = obj.elements();
-        bufVert.bufferData(verts);
-        bufElem.bufferData(elements);
+        elements = obj.elements();
+        bufVert.bufferData(new Float32Array(verts.reduce( function (p, c) { return p.concat(c); }, [])));
+        bufElem.bufferData(new Uint16Array(elements));
 
         gl.vertexAttribPointer(shdr.enableVAA("pos"), 3, gl.FLOAT, false, 0, 0);
 
