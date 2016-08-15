@@ -13,7 +13,11 @@ function objParser() {
             var vertex = verts.split(' ');
             vertex.shift(); // get rid og the v
             return vertex.map(function (v) {
-                return Number(v);
+                var tmp = Number(v);
+                if (tmp == -0) {
+                    tmp = 0;
+                }
+                return tmp;
             });
         });
     }
@@ -25,7 +29,11 @@ function objParser() {
             var normal = normals.split(' ');
             normal.shift(); // get rid og the vn
             return normal.map(function (n) {
-                return Number(n);
+                var tmp = Number(n);
+                if (tmp == -0) {
+                    tmp = 0;
+                }
+                return tmp;
             });
         });
     }
